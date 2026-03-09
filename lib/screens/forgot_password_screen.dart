@@ -2,24 +2,48 @@ import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
 
-  final emailController = TextEditingController();
+  final mobileController = TextEditingController();
+
+  void sendOTP(BuildContext context) {
+
+    String mobile = mobileController.text.trim();
+
+    if (mobile.length != 10) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Enter a valid 10-digit mobile number"),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      return;
+    }
+
+    /// Later you will call backend OTP API here
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("OTP sent to $mobile"),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Forgot Password"),
-      ),
+      backgroundColor: Colors.white,
 
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(25),
 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
+              /// Icon
               Icon(
                 Icons.lock_reset,
                 size: 70,
@@ -28,10 +52,11 @@ class ForgotPasswordScreen extends StatelessWidget {
 
               SizedBox(height: 15),
 
+              /// Title
               Text(
                 "Reset Password",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -39,37 +64,37 @@ class ForgotPasswordScreen extends StatelessWidget {
               SizedBox(height: 5),
 
               Text(
-                "Enter your email to receive a reset link",
+                "Enter your mobile number to receive OTP",
                 style: TextStyle(
                   color: Colors.grey[600],
                 ),
               ),
 
-              SizedBox(height: 30),
+              SizedBox(height: 40),
 
+              /// Mobile Number Field
               TextField(
-                controller: emailController,
+                controller: mobileController,
+                keyboardType: TextInputType.phone,
+                maxLength: 10,
+
                 decoration: InputDecoration(
-                  labelText: "Email",
-                  prefixIcon: Icon(Icons.email),
+                  labelText: "Mobile Number",
+                  prefixIcon: Icon(Icons.phone),
+                  counterText: "",
                 ),
               ),
 
               SizedBox(height: 25),
 
+              /// Send OTP Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Reset link sent to your email"),
-                      ),
-                    );
-
+                    sendOTP(context);
                   },
-                  child: Text("Send Reset Link"),
+                  child: Text("Send OTP"),
                 ),
               ),
 
