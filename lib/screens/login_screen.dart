@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import 'loading_screen.dart';
 
 class LoginScreen extends StatelessWidget {
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              /// Logo
+              /// App Logo
               const Icon(
                 Icons.account_balance_wallet,
                 size: 70,
@@ -42,10 +43,10 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 5),
 
-              Text(
+              const Text(
                 "Pool money with friends easily",
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Colors.grey,
                 ),
               ),
 
@@ -54,6 +55,7 @@ class LoginScreen extends StatelessWidget {
               /// Login Card
               Container(
                 padding: const EdgeInsets.all(20),
+
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(15),
@@ -93,7 +95,7 @@ class LoginScreen extends StatelessWidget {
 
                     const SizedBox(height: 5),
 
-                    /// Forgot Password (LEFT aligned)
+                    /// Forgot Password
                     TextButton(
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
@@ -120,16 +122,25 @@ class LoginScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => DashboardScreen(),
-                            ),
-                          );
+                        onPressed: () {
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (_) => LoadingScreen(),
+  ),
+);
 
                         },
+
                         child: const Text("Login"),
                       ),
                     ),
@@ -149,6 +160,7 @@ class LoginScreen extends StatelessWidget {
                           );
 
                         },
+
                         child: const Text(
                           "Create Account",
                           style: TextStyle(
