@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CreatePoolScreen extends StatefulWidget {
   @override
-  _CreatePoolScreenState createState() => _CreatePoolScreenState();
+  State<CreatePoolScreen> createState() => _CreatePoolScreenState();
 }
 
 class _CreatePoolScreenState extends State<CreatePoolScreen> {
@@ -10,18 +10,47 @@ class _CreatePoolScreenState extends State<CreatePoolScreen> {
   final nameController = TextEditingController();
   final targetController = TextEditingController();
   final membersController = TextEditingController();
+  final searchController = TextEditingController();
 
-  double sharePerPerson = 0;
+  bool showSearch = false;
 
-  void calculateShare() {
-    double target = double.tryParse(targetController.text) ?? 0;
-    int members = int.tryParse(membersController.text) ?? 0;
+  List<String> allUsers = [
+    "Rahul",
+    "Arun",
+    "Vikram",
+    "Karthik",
+    "Ajay"
+  ];
 
-    if (members > 0) {
+  List<String> filteredUsers = [];
+  List<String> selectedMembers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredUsers = allUsers;
+  }
+
+  void searchUsers(String query) {
+    setState(() {
+      filteredUsers = allUsers
+          .where((u) => u.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void addMember(String name) {
+    if (!selectedMembers.contains(name)) {
       setState(() {
-        sharePerPerson = target / members;
+        selectedMembers.add(name);
       });
     }
+  }
+
+  void removeMember(String name) {
+    setState(() {
+      selectedMembers.remove(name);
+    });
   }
 
   @override
@@ -29,79 +58,170 @@ class _CreatePoolScreenState extends State<CreatePoolScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Pool"),
+        title: const Text("Create Pool"),
+        backgroundColor: Colors.black,
       ),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-          children: [
-
-            /// Pool Name
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: "Pool Name",
-              ),
-            ),
-
-            SizedBox(height: 15),
-
-            /// Target Amount
-            TextField(
-              controller: targetController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Target Amount",
-              ),
-              onChanged: (value) => calculateShare(),
-            ),
-
-            SizedBox(height: 15),
-
-            /// Total Members
-            TextField(
-              controller: membersController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Total Members",
-              ),
-              onChanged: (value) => calculateShare(),
-            ),
-
-            SizedBox(height: 20),
-
-            /// Share per person
-            if (sharePerPerson > 0)
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "Each member should contribute: ₹${sharePerPerson.toStringAsFixed(2)}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: "Pool Name",
                 ),
               ),
 
-            SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-            Center(
-              child: ElevatedButton(
+              TextField(
+                controller: targetController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Target Amount",
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              TextField(
+                controller: membersController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Total Members",
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                ),
                 onPressed: () {
-                  // API call later
+                  setState(() {
+                    showSearch = !showSearch;
+                  });
                 },
-                child: Text("Create Pool"),
+                icon: const Icon(Icons.person_add),
+                label: const Text("Add Members"),
               ),
-            ),
 
-          ],
+              const SizedBox(height: 15),
+
+              if (showSearch)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    TextField(
+                      controller: searchController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        labelText: "Search Members",
+                      ),
+                      onChanged: searchUsers,
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredUsers.length,
+                      itemBuilder: (context, index) {
+
+                        String user = filteredUsers[index];
+
+                        return ListTile(
+                          title: Text(user),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              addMember(user);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+
+              const SizedBox(height: 20),
+
+              if (selectedMembers.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    const Text(
+                      "Selected Members",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Wrap(
+                      spacing: 8,
+                      children: selectedMembers.map((member) {
+
+                        return Chip(
+                          label: Text(member),
+                          deleteIcon: const Icon(Icons.close),
+                          onDeleted: () {
+                            removeMember(member);
+                          },
+                        );
+
+                      }).toList(),
+                    ),
+                  ],
+                ),
+
+              const SizedBox(height: 30),
+
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
+
+                  onPressed: () {
+
+                    if (nameController.text.isEmpty ||
+                        targetController.text.isEmpty) {
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please fill all fields"),
+                        ),
+                      );
+
+                      return;
+                    }
+
+                    Map<String, dynamic> newPool = {
+                      "name": nameController.text,
+                      "collected": 0,
+                      "target": int.parse(targetController.text)
+                    };
+
+                    Navigator.pop(context, newPool);
+                  },
+
+                  child: const Text("Create Pool"),
+                ),
+              )
+
+            ],
+          ),
         ),
       ),
     );

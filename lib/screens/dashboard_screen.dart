@@ -11,15 +11,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   bool isLoading = true;
 
+  List<Map<String, dynamic>> pools = [
+    {
+      "name": "Goa Trip Pool",
+      "collected": 16000,
+      "target": 20000
+    }
+  ];
+
   @override
   void initState() {
     super.initState();
 
-    /// Simulate loading delay (API / images)
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         isLoading = false;
       });
+    });
+  }
+
+  void addPool(Map<String, dynamic> newPool) {
+    setState(() {
+      pools.add(newPool);
     });
   }
 
@@ -31,18 +44,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+
+          final newPool = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => CreatePoolScreen()),
+            MaterialPageRoute(
+              builder: (_) => CreatePoolScreen(),
+            ),
           );
+
+          if (newPool != null) {
+            addPool(newPool);
+          }
         },
       ),
 
       body: Stack(
         children: [
 
-          /// DASHBOARD CONTENT
           SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -51,7 +70,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 40),
 
-                /// Welcome
                 const Text(
                   "Welcome back 👋",
                   style: TextStyle(
@@ -69,7 +87,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 20),
 
-                /// Banner Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.network(
@@ -77,32 +94,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
-
-                    /// When image loads → remove loader
-                    loadingBuilder: (context, child, progress) {
-
-                      if (progress == null) {
-                        Future.microtask(() {
-                          if (mounted) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        });
-                        return child;
-                      }
-
-                      return Container(
-                        height: 180,
-                        color: Colors.grey[200],
-                      );
-                    },
                   ),
                 ),
 
                 const SizedBox(height: 25),
 
-                /// Active Pools
                 const Text(
                   "Active Pools",
                   style: TextStyle(
@@ -113,56 +109,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 15),
 
-                /// Pool Card
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => PoolDetailsScreen()),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pools.length,
+                  itemBuilder: (context, index) {
+
+                    var pool = pools[index];
+                    double progress = pool["collected"] / pool["target"];
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PoolDetailsScreen(
+  pool: pool,
+),
+                          ),
+                        );
+                      },
+
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              pool["name"],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Text("₹${pool["collected"]} / ₹${pool["target"]}"),
+
+                            const SizedBox(height: 10),
+
+                            LinearProgressIndicator(
+                              value: progress,
+                              backgroundColor: Colors.grey[300],
+                              color: Colors.black,
+                            ),
+
+                          ],
+                        ),
+                      ),
                     );
                   },
-
-                  child: Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        const Text(
-                          "Goa Trip Pool",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        const Text("₹16000 / ₹20000"),
-
-                        const SizedBox(height: 10),
-
-                        LinearProgressIndicator(
-                          value: 0.8,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.black,
-                        ),
-
-                      ],
-                    ),
-                  ),
                 ),
 
               ],
             ),
           ),
 
-          /// GATHERPAY LOADING OVERLAY
           if (isLoading)
             Container(
               color: Colors.white,

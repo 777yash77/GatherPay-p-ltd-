@@ -6,6 +6,10 @@ import 'loading_screen.dart';
 
 class LoginScreen extends StatelessWidget {
 
+  final VoidCallback toggleTheme;
+
+  LoginScreen({required this.toggleTheme});
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -22,7 +26,13 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
+                           Align(
+  alignment: Alignment.topRight,
+  child: IconButton(
+    icon: Icon(Icons.brightness_6),
+    onPressed: toggleTheme,
+  ),
+),
               /// App Logo
               const Icon(
                 Icons.account_balance_wallet,
