@@ -1,14 +1,11 @@
 services:
   - type: web
     name: gatherpay-backend
-    runtime: java
+    runtime: docker
     rootDir: backend
-    buildCommand: mvn package -DskipTests
-    startCommand: java -jar target/gatherpay-backend-0.0.1-SNAPSHOT.jar
+    dockerfilePath: ./Dockerfile
     plan: free
     envVars:
-      - key: JAVA_VERSION
-        value: 21
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
