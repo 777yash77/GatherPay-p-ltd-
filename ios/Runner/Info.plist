@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>GatherPay uses your contacts to help you quickly add members to pools.</string>
 </dict>
 </plist>

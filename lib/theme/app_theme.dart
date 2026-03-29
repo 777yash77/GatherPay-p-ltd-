@@ -1,107 +1,141 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData theme = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: Colors.black,
-    scaffoldBackgroundColor: Colors.white,
-    colorScheme: const ColorScheme.light(
-      primary: Colors.black,
-      secondary: Colors.black,
-      surface: Colors.white,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.black,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-    ),
-    cardTheme: CardThemeData(
-      color: Colors.white,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: Colors.black, width: 1.5),
+  static const Color ink = Color(0xFF172033);
+  static const Color coral = Color(0xFFFF8A6B);
+  static const Color mint = Color(0xFFB7F5D1);
+  static const Color peach = Color(0xFFFFE7CC);
+  static const Color cloud = Color(0xFFF7F8FC);
+  static const Color slate = Color(0xFF70819A);
+  static const Color cardBorder = Color(0xFFE2E8F0);
+
+  static ThemeData get theme {
+    final base = ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: cloud,
+      colorScheme: const ColorScheme.light(
+        primary: ink,
+        secondary: coral,
+        tertiary: mint,
+        surface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: ink,
+        onSurface: ink,
       ),
-    ),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: Colors.black,
-      contentTextStyle: const TextStyle(color: Colors.white),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+      fontFamily: 'Georgia',
+    );
+
+    return base.copyWith(
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        foregroundColor: ink,
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: Colors.black, width: 1.5),
+          borderRadius: BorderRadius.circular(28),
+          side: const BorderSide(color: cardBorder),
         ),
       ),
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.black,
+      chipTheme: base.chipTheme.copyWith(
+        backgroundColor: Colors.white,
+        selectedColor: ink,
+        secondarySelectedColor: coral,
+        labelStyle: const TextStyle(color: ink, fontWeight: FontWeight.w600),
+        secondaryLabelStyle: const TextStyle(color: Colors.white),
+        side: const BorderSide(color: cardBorder),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
       ),
-    ),
-    chipTheme: ChipThemeData(
-      backgroundColor: Colors.white,
-      deleteIconColor: Colors.black,
-      disabledColor: Colors.white,
-      selectedColor: Colors.black,
-      secondarySelectedColor: Colors.black,
-      labelStyle: const TextStyle(color: Colors.black),
-      secondaryLabelStyle: const TextStyle(color: Colors.white),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      side: const BorderSide(color: Colors.black, width: 1.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        hintStyle: const TextStyle(color: slate),
+        labelStyle: const TextStyle(color: slate),
+        prefixIconColor: ink,
+        suffixIconColor: ink,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: cardBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: cardBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: coral, width: 1.4),
+        ),
       ),
-    ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: Colors.black,
-      linearTrackColor: Colors.white,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: Colors.white,
-      labelStyle: const TextStyle(color: Colors.black),
-      hintStyle: TextStyle(color: Colors.black.withOpacity(0.6)),
-      prefixIconColor: Colors.black,
-      suffixIconColor: Colors.black,
-      counterStyle: const TextStyle(color: Colors.black),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.black, width: 1.4),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ink,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.black, width: 2),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: coral,
+        foregroundColor: ink,
       ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.black, width: 1.4),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: ink,
+        behavior: SnackBarBehavior.floating,
+        contentTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.black, width: 2),
+      textTheme: base.textTheme.copyWith(
+        headlineLarge: const TextStyle(
+          color: ink,
+          fontWeight: FontWeight.w700,
+          fontSize: 34,
+          letterSpacing: -0.8,
+        ),
+        headlineMedium: const TextStyle(
+          color: ink,
+          fontWeight: FontWeight.w700,
+          fontSize: 28,
+        ),
+        titleLarge: const TextStyle(
+          color: ink,
+          fontWeight: FontWeight.w700,
+          fontSize: 20,
+        ),
+        titleMedium: const TextStyle(
+          color: ink,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        bodyLarge: const TextStyle(
+          color: ink,
+          fontSize: 16,
+          height: 1.4,
+        ),
+        bodyMedium: const TextStyle(
+          color: slate,
+          fontSize: 14,
+          height: 1.45,
+        ),
       ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.black, width: 1.4),
-      ),
-    ),
-  );
+    );
+  }
 }
