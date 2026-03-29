@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -293,7 +294,11 @@ class ApiService {
     Future<http.Response> Function() request,
   ) async {
     try {
-      return await request().timeout(const Duration(seconds: 20));
+      return await request().timeout(const Duration(seconds: 60));
+    } on TimeoutException {
+      throw Exception(
+        'The backend is taking too long to respond. If you are using Render free tier, the server may be waking up. Wait a moment and try again.',
+      );
     } on SocketException {
       throw Exception(
         'Cannot reach the backend. Start the server or set API_BASE_URL to your deployed backend URL.',
