@@ -1,0 +1,30 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+  jackson:
+    time-zone: Asia/Kolkata
+
+server:
+  port: ${PORT:9191}
+
+app:
+  database:
+    url: ${DATABASE_URL:jdbc:postgresql://dpg-d6vnfcs50q8c739o5jpg-a.singapore-postgres.render.com/db_t0ui?sslmode=require}
+    username: ${DATABASE_USERNAME:db_t0ui_user}
+    password: ${DATABASE_PASSWORD:ePtbMFYD8QWH409USjlxfwXlqck4X3i4}
+  jwt:
+    secret: ${JWT_SECRET:GatherPaySuperSecretJwtKeyForTodayBuildPleaseChangeImmediately123456}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:8081,http://localhost:8080}
+
+logging:
+  level:
+    org.springframework.security: INFO
