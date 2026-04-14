@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../models/app_models.dart';
 import '../services/api_service.dart';
@@ -23,7 +24,7 @@ class ContributeScreen extends StatefulWidget {
 }
 
 class _ContributeScreenState extends State<ContributeScreen> {
-  late final TextEditingController _upiController;
+  late final Razorpay _razorpay;
   final _amountController = TextEditingController();
   late PoolModel _pool;
   bool _submitting = false;
@@ -32,43 +33,47 @@ class _ContributeScreenState extends State<ContributeScreen> {
   void initState() {
     super.initState();
     _pool = widget.pool;
-    _upiController = TextEditingController(text: widget.currentUser.upiId);
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   void dispose() {
-    _upiController.dispose();
+    _razorpay.clear();
     _amountController.dispose();
     super.dispose();
   }
 
-  Future<void> _submitPayment() async {
-    final enteredAmount = int.tryParse(_amountController.text.trim()) ?? 0;
-    final remainingAmount = _pool.targetAmount - _pool.collectedAmount;
-    final hasValidUpi = _upiController.text.trim().contains('@');
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    _contributeToBackend(response.paymentId!);
+  }
 
-    if (!hasValidUpi || enteredAmount <= 0 || enteredAmount > remainingAmount) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid UPI and amount within the remaining target.')),
-      );
-      return;
-    }
-
+  void _handlePaymentError(PaymentFailureResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Payment failed: ${response.message}')),
+    );
     setState(() {
-      _submitting = true;
+      _submitting = false;
     });
+  }
 
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Handle external wallet if needed
+  }
+
+  Future<void> _contributeToBackend(String paymentId) async {
     try {
+      final enteredAmount = int.parse(_amountController.text.trim());
       final updatedPool = await ApiService.contribute(
         token: widget.token,
         poolId: _pool.id,
         amount: enteredAmount,
-        upiId: _upiController.text.trim(),
+        upiId: paymentId,
       );
       widget.onPoolUpdated(updatedPool);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         _pool = updatedPool;
         _amountController.clear();
@@ -77,9 +82,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         const SnackBar(content: Text('Contribution added successfully.')),
       );
     } catch (error) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
       );
@@ -90,6 +93,35 @@ class _ContributeScreenState extends State<ContributeScreen> {
         });
       }
     }
+  }
+
+  Future<void> _submitPayment() async {
+    final enteredAmount = int.tryParse(_amountController.text.trim()) ?? 0;
+    final remainingAmount = _pool.targetAmount - _pool.collectedAmount;
+
+    if (enteredAmount <= 0 || enteredAmount > remainingAmount) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid amount within the remaining target.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _submitting = true;
+    });
+
+    var options = {
+      'key': 'rzp_test_Sa8ru5f1To0dwi', // Replace with your Razorpay test key
+      'amount': enteredAmount * 100, // Amount in paise
+      'name': 'GatherPay',
+      'description': 'Contribution to ${_pool.name}',
+      'prefill': {
+        'contact': widget.currentUser.mobileNumber,
+        'email': '', // Add email if available
+      }
+    };
+
+    _razorpay.open(options);
   }
 
   @override
@@ -132,15 +164,13 @@ class _ContributeScreenState extends State<ContributeScreen> {
               ),
             ),
             const SizedBox(height: 18),
-            TextField(controller: _upiController, decoration: const InputDecoration(labelText: 'UPI ID')),
-            const SizedBox(height: 14),
             TextField(controller: _amountController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Amount', hintText: 'Max Rs.$remainingAmount', prefixText: 'Rs. ')),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _submitting ? null : _submitPayment,
-                child: Text(_submitting ? 'Processing...' : 'Pay Now'),
+                child: Text(_submitting ? 'Processing...' : 'Pay with Razorpay'),
               ),
             ),
           ],
